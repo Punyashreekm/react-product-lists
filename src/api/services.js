@@ -8,7 +8,7 @@ export const theProductsApi = createApi({
   }),
   endpoints: (build) => ({
     getProducts: build.query({
-      query: ({ page }) => `/products?offset=${page}&limit=10`,
+      query: ({ page, title }) => `/products?offset=${page}&limit=10&title=${title}`,
     }),
   }),
 });

@@ -4,16 +4,16 @@ import ProductCard from "./components/ProductCard";
 
 function App() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const page = searchParams.get("page") || 1;
-
-  const { data, error, isLoading } = useGetProductsQuery({ page });
+  const page = searchParams.get("page") || 0;
+  const title = searchParams.get("title") || "";
+  const { data, error, isLoading } = useGetProductsQuery({ page: +page * 10, title });
 
   const handleNext = () => {
     setSearchParams({ page: +page + 1 });
   };
 
   const handlePrev = () => {
-    if (page > 1) {
+    if (+page > 0) {
       setSearchParams({ page: +page - 1 });
     }
   };
@@ -25,6 +25,19 @@ function App() {
     <main className="min-h-screen bg-gray-50 dark:bg-slate-900 p-6">
       <h1 className="text-3xl font-bold text-center mb-8 text-slate-800 dark:text-white">Product List</h1>
 
+      <input
+        className="bg-white w-full rounded-sm px-4 py-2 mb-6 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        type="text"
+        placeholder="Search"
+        value={title}
+        onChange={(e) => {
+          setSearchParams((prev) => {
+            prev.set("title", e.target.value);
+            return prev;
+          });
+        }}
+      />
+
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {data?.map((product) => (
           <ProductCard key={product.id} product={product} />
@@ -33,9 +46,9 @@ function App() {
       <div className="flex justify-center mt-8 gap-4">
         <button
           onClick={handlePrev}
-          disabled={+page === 1}
+          disabled={+page === 0}
           className={`px-5 py-2 rounded-lg font-medium transition-all duration-200 
-          ${+page === 1 ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"}`}
+          ${+page === 0 ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"}`}
         >
           Prev
         </button>
@@ -46,11 +59,11 @@ function App() {
           onClick={handleNext}
           className={`px-5 py-2 rounded-lg font-medium transition-all duration-200 
           ${
-            data?.length === 0
+            data?.length < 10
               ? "bg-gray-200 text-gray-400 cursor-not-allowed"
               : "bg-blue-600 text-white hover:bg-blue-700"
           }`}
-          disabled={data?.length === 0}
+          disabled={data?.length < 10}
         >
           Next
         </button>
